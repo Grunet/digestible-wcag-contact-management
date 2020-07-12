@@ -2,6 +2,7 @@
   "name": "digestible-wcag-contact-management",
   "version": "0.0.1",
   "description": "Contains endpoints for accessing/modifying contact lists and information for the digestible wcag project",
+  "main": "/dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
