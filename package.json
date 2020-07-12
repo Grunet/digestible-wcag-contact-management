@@ -13,5 +13,8 @@
   "bugs": {
     "url": "https://github.com/Grunet/digestible-wcag-contact-management/issues"
   },
-  "homepage": "https://github.com/Grunet/digestible-wcag-contact-management#readme"
+  "homepage": "https://github.com/Grunet/digestible-wcag-contact-management#readme",
+  "dependencies": {
+    "aws-sdk": "^2.713.0"
+  }
 }
