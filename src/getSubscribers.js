@@ -18,7 +18,9 @@ async function getSubscribers() {
     const jsObj = JSON.parse(json);
     const listOfSubscribers = jsObj["subscribers"];
 
-    return new Set(listOfSubscribers);
+    return {
+      subscribers: new Set(listOfSubscribers),
+    };
   } catch (error) {
     throw error;
   }
