@@ -16,6 +16,6 @@
   },
   "homepage": "https://github.com/Grunet/digestible-wcag-contact-management#readme",
   "dependencies": {
-    "aws-sdk": "^2.742.0"
+    "aws-sdk": "^2.747.0"
   }
 }
