@@ -1,5 +1,5 @@
 require("dotenv").config({
-  path: require("path").join(__dirname, ".env"),
+  path: require("find-config")(".env", { cwd: __dirname }),
 });
 
 const { getSubscribers } = require("../../../dist/index.js");
@@ -7,8 +7,8 @@ const { getSubscribers } = require("../../../dist/index.js");
 (async function () {
   const inputs = {
     mailchimp: {
-      apiKey: process.env.MAILCHIMP_API_KEY,
-      listId: process.env.MAILCHIMP_LIST_ID,
+      apiKey: process.env.MANUAL_MAILCHIMP_API_KEY,
+      listId: process.env.MANUAL_MAILCHIMP_LIST_ID,
     },
   };
 
