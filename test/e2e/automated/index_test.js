@@ -126,36 +126,73 @@ async function __addList(mailchimpClient) {
 }
 
 async function __addSubscribers(mailchimpClient, listId, numToAdd) {
-  /**Need to use something that looks real or Mailchimp won't add it
-   *Need to use something unique each time or Mailchimp (eventually) won't add it
-   *(Also the same email can't be re-added to the same list after it's been deleted)
-   */
-  const mockSubscribers = [...Array(numToAdd).keys()]
-    .map((v) => `schramloewner${v}-${Date.now()}@gmail.com`)
-    .map((emailAddress) => ({
-      email_address: emailAddress,
-      status: "subscribed",
-    }));
+  //Mailchimp will fail if more than this number are included in the request, so batching is required
+  const MAX_MEMBERS_PER_REQUEST = 500;
 
-  const { new_members, errors } = await mailchimpClient.request({
+  const indexBatches = [
+    ...Array(Math.ceil(numToAdd / MAX_MEMBERS_PER_REQUEST)).keys(),
+  ]
+    .map((index) => ({
+      lowerBound: MAX_MEMBERS_PER_REQUEST * index,
+      upperBound: Math.min(MAX_MEMBERS_PER_REQUEST * (index + 1), numToAdd),
+    }))
+    .map(({ lowerBound, upperBound }) => ({
+      lowerBound: lowerBound,
+      intervalLength: upperBound - lowerBound,
+    }))
+    .map(({ lowerBound, intervalLength }) => {
+      return Array.from(
+        new Array(intervalLength),
+        (_unused, index) => lowerBound + index
+      );
+    });
+
+  const mockSubscriberBatches = indexBatches.map((indexBatch) => {
+    /**
+     *Need to use something that looks real or Mailchimp won't add it
+     *Need to use something unique each time or Mailchimp (eventually) won't add it
+     *(Also the same email can't be re-added to the same list after it's been deleted)
+     */
+    return indexBatch
+      .map((index) => `schramloewner${index}-${Date.now()}@gmail.com`)
+      .map((emailAddress) => ({
+        email_address: emailAddress,
+        status: "subscribed",
+      }));
+  });
+
+  const additionCalls = mockSubscriberBatches.map((mockSubscriberData) => ({
     method: "post",
     path: `/lists/${listId}`,
     body: {
-      members: mockSubscribers,
+      members: mockSubscriberData,
     },
-  }); //BEWARE - this request can return a 200 response even after failing to add contacts (but seems to populate the "errors" array when that happens)
-
-  if (errors?.length > 0) {
-    console.error(errors);
-    throw new Error("Failed to add subscribers to the list");
-  }
-
-  const trimmed_new_members = new_members.map(({ id }) => ({
-    id: id,
   }));
 
+  //BEWARE - these requests can return HTTP 200 responses even after failing to add contacts (but seems to populate the "errors" array when that happens)
+  const res = await mailchimpClient.batch(additionCalls);
+
+  const subscriberData = res
+    .map(({ new_members, errors }) => {
+      if (errors?.length > 0) {
+        console.error(errors);
+        throw new Error("Failed to add subscribers to the list");
+      }
+
+      const trimmed_new_members = new_members.map(({ id }) => ({
+        id: id,
+      }));
+
+      return {
+        trimmed_new_members: trimmed_new_members,
+      };
+    })
+    .reduce((accumulator, { trimmed_new_members }) => {
+      return accumulator.concat(trimmed_new_members);
+    }, []);
+
   return {
-    subscriberData: trimmed_new_members,
+    subscriberData: subscriberData,
   };
 }
 
