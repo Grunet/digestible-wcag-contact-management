@@ -4,7 +4,7 @@
   "description": "Contains endpoints for accessing/modifying contact lists and information for the digestible wcag project",
   "main": "dist/index.js",
   "scripts": {
-    "test-e2e": "jest --config ./test/jest.config.js --coverage --testMatch **\\test\\e2e\\automated\\*_test.js"
+    "test-e2e": "jest --config ./jest.config.js --coverage --testMatch **\\test\\e2e\\automated\\*_test.js"
   },
   "repository": {
     "type": "git",
