@@ -78,6 +78,7 @@ describe("getSubscribers", () => {
     );
   });
 
+  //TIP: - Use "test.skip" instead of "test" to skip this since it will take a long time for the afterEach to finish
   test("Retrieves the maximum number of contacts a free account can hold", async () => {
     //ARRANGE
     const MAX_NUM_CONTACTS = 2000;
