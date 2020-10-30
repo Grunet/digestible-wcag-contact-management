@@ -122,7 +122,7 @@ async function __deleteAllLists(mailchimpClient) {
     path: `/lists/${id}`,
   }));
 
-  await mailchimpClient.batch(deleteCalls);
+  await mailchimpClient.batch(deleteCalls, { verbose: false });
 }
 
 async function __addList(mailchimpClient) {
@@ -202,7 +202,7 @@ async function __addSubscribers(mailchimpClient, listId, numToAdd) {
   }));
 
   //BEWARE - these requests can return HTTP 200 responses even after failing to add contacts (but seems to populate the "errors" array when that happens)
-  const res = await mailchimpClient.batch(additionCalls);
+  const res = await mailchimpClient.batch(additionCalls, { verbose: false });
 
   const subscriberData = res
     .map(({ new_members, errors }) => {
@@ -244,5 +244,5 @@ async function __deleteAllMembers(mailchimpClient, listId, memberIds) {
     path: `/lists/${listId}/members/${id}/actions/delete-permanent`,
   }));
 
-  await mailchimpClient.batch(deleteCalls);
+  await mailchimpClient.batch(deleteCalls, { verbose: false });
 }
