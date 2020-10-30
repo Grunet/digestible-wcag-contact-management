@@ -32,7 +32,7 @@ afterAll(async () => {
 });
 
 describe("getSubscribers", () => {
-  const DEFAULT_NUM_CONTACTS = 10;
+  const DEFAULT_NUM_CONTACTS = 2000; //Maximum the free plan allows for
 
   let mailchimpMembersData;
 
@@ -44,13 +44,18 @@ describe("getSubscribers", () => {
     ));
   });
 
-  afterEach(async () => {
-    await __deleteAllMembers(
-      mailchimpClient,
-      testListId,
-      mailchimpMembersData.map(({ id }) => id)
-    );
-  });
+  /**
+   * Uncomment this afterEach if more tests are added (and cleanup is needed inbetween them)
+   * It's very slow with a large number of contacts since deleting members has to happen one at a time
+   * Might be able to get away with making the requests in parallel (instead of serially batching). Unclear if/how Mailchimp would handle that
+   */
+  // afterEach(async () => {
+  //   await __deleteAllMembers(
+  //     mailchimpClient,
+  //     testListId,
+  //     mailchimpMembersData.map(({ id }) => id)
+  //   );
+  // });
 
   test("Only finds subscribers, not all contacts", async () => {
     //ARRANGE

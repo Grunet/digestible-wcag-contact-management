@@ -54,9 +54,18 @@ class MailChimpAdapter {
   }
 
   __adaptRawContactsData(rawContactsData) {
-    const { members } = rawContactsData;
+    //If the calls aren't batched, the response is a single object (that isn't wrapped in an array)
+    const rawContactsDataBatches = Array.isArray(rawContactsData)
+      ? rawContactsData
+      : [rawContactsData];
 
-    const adaptedContactsData = members.map(({ email_address, status }) => {
+    const allMembers = rawContactsDataBatches
+      .map(({ members }) => members)
+      .reduce((accumulatedMembers, members) => {
+        return accumulatedMembers.concat(members);
+      });
+
+    const adaptedContactsData = allMembers.map(({ email_address, status }) => {
       return {
         email_address: email_address,
         isSubscribed: status === "subscribed",
