@@ -32,17 +32,7 @@ afterAll(async () => {
 });
 
 describe("getSubscribers", () => {
-  const DEFAULT_NUM_CONTACTS = 2000; //Maximum the free plan allows for
-
   let mailchimpMembersData;
-
-  beforeEach(async () => {
-    ({ subscriberData: mailchimpMembersData } = await __addSubscribers(
-      mailchimpClient,
-      testListId,
-      DEFAULT_NUM_CONTACTS
-    ));
-  });
 
   /**
    * This is pretty slow with a large number of contacts since deleting members has to happen one at a time on Mailchimp's side
@@ -53,10 +43,20 @@ describe("getSubscribers", () => {
       testListId,
       mailchimpMembersData.map(({ id }) => id)
     );
+
+    mailchimpMembersData = undefined;
   });
 
-  test("Only finds subscribers, not all contacts", async () => {
+  test("Does not include unsubscribed contacts", async () => {
     //ARRANGE
+    const NUM_CONTACTS = 10;
+
+    ({ subscriberData: mailchimpMembersData } = await __addSubscribers(
+      mailchimpClient,
+      testListId,
+      NUM_CONTACTS
+    ));
+
     const someMemberId = mailchimpMembersData[0].id;
     await __unsubscribeMember(mailchimpClient, testListId, someMemberId);
 
@@ -69,7 +69,35 @@ describe("getSubscribers", () => {
     });
 
     //ASSERT
-    const expectedNumberOfSubscribers = DEFAULT_NUM_CONTACTS - 1;
+    const expectedNumberOfSubscribers = NUM_CONTACTS - 1;
+
+    expect(Array.from(res.subscribers)).toEqual(
+      Array.from({ length: expectedNumberOfSubscribers }).map(() => ({
+        email: expect.anything(),
+      }))
+    );
+  });
+
+  test("Retrieves the maximum number of contacts a free account can hold", async () => {
+    //ARRANGE
+    const MAX_NUM_CONTACTS = 2000;
+
+    ({ subscriberData: mailchimpMembersData } = await __addSubscribers(
+      mailchimpClient,
+      testListId,
+      MAX_NUM_CONTACTS
+    ));
+
+    //ACT
+    const res = await getSubscribers({
+      mailchimp: {
+        apiKey: testApiKey,
+        listId: testListId,
+      },
+    });
+
+    //ASSERT
+    const expectedNumberOfSubscribers = MAX_NUM_CONTACTS;
 
     expect(Array.from(res.subscribers)).toEqual(
       Array.from({ length: expectedNumberOfSubscribers }).map(() => ({
