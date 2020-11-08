@@ -16,7 +16,6 @@
   },
   "homepage": "https://github.com/Grunet/digestible-wcag-contact-management#readme",
   "dependencies": {
-    "aws-sdk": "^2.783.0",
     "mailchimp-api-v3": "^1.14.0"
   },
   "devDependencies": {
