@@ -16,7 +16,7 @@
   },
   "homepage": "https://github.com/Grunet/digestible-wcag-contact-management#readme",
   "dependencies": {
-    "mailchimp-api-v3": "^1.14.0"
+    "mailchimp-api-v3": "^1.15.0"
   },
   "devDependencies": {
     "dotenv": "^8.2.0",
