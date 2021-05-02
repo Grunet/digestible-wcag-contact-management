@@ -8,6 +8,12 @@
       "group": "test",
       "type": "shell",
       "command": "node ./test/e2e/manual/index_getSubscribers_test.js"
+    },
+    {
+      "label": "Automated - e2e tests - getSubscribers",
+      "group": "test",
+      "type": "shell",
+      "command": "npm run test-e2e"
     }
   ]
 }
